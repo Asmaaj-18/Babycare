@@ -1,0 +1,20 @@
+[
+  {
+    "name": "Health Check",
+    "request": {
+      "method": "GET",
+      "url": "http://localhost:3000/api/health"
+    }
+  },
+  {
+    "name": "Register User",
+    "request": {
+      "method": "POST",
+      "url": "http://localhost:3000/api/auth/register",
+      "headers": {
+        "Content-Type": "application/json"
+      },
+      "body": "{\"email\":\"test@example.com\",\"password\":\"password123\",\"firstName\":\"John\",\"lastName\":\"Doe\",\"userType\":\"PARENT\"}"
+    }
+  }
+]

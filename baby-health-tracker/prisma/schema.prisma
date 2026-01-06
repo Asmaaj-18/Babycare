@@ -1,0 +1,165 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String         @id @default(uuid())
+  email         String         @unique
+  password      String
+  firstName     String
+  lastName      String
+  userType      String         // PARENT, HEALTH_PROFESSIONAL, CAREGIVER
+  babies        BabyUser[]
+  notifications Notification[]
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+
+  @@map("users")
+}
+
+model Baby {
+  id               String          @id @default(uuid())
+  firstName        String
+  lastName         String
+  birthDate        DateTime
+  birthWeight      Float
+  birthHeight      Float
+  gender           String
+  users            BabyUser[]
+  sleepRecords     SleepRecord[]
+  feedingRecords   FeedingRecord[]
+  growthRecords    GrowthRecord[]
+  vaccineRecords   VaccineRecord[]
+  healthChecks     HealthCheck[]
+  milestones       Milestone[]
+  notifications    Notification[]
+  createdAt        DateTime        @default(now())
+  updatedAt        DateTime        @updatedAt
+
+  @@map("babies")
+}
+
+model BabyUser {
+  id              String     @id @default(uuid())
+  baby            Baby       @relation(fields: [babyId], references: [id])
+  babyId          String
+  user            User       @relation(fields: [userId], references: [id])
+  userId          String
+  relationshipType String
+  accessLevel     String     // FULL, READ_ONLY
+  createdAt       DateTime   @default(now())
+
+  @@unique([babyId, userId])
+  @@map("baby_users")
+}
+
+model SleepRecord {
+  id              String   @id @default(uuid())
+  baby            Baby     @relation(fields: [babyId], references: [id])
+  babyId          String
+  startTime       DateTime
+  endTime         DateTime
+  durationMinutes Int
+  sleepQuality    String   // good, average, poor
+  notes           String?
+  createdBy       String
+  createdAt       DateTime @default(now())
+
+  @@map("sleep_records")
+}
+
+model FeedingRecord {
+  id               String   @id @default(uuid())
+  baby             Baby     @relation(fields: [babyId], references: [id])
+  babyId           String
+  type             String   // breast, bottle, solid
+  amountMl         Int?
+  foodDescription  String?
+  startTime        DateTime
+  endTime          DateTime
+  notes            String?
+  createdBy        String
+  createdAt        DateTime @default(now())
+
+  @@map("feeding_records")
+}
+
+model GrowthRecord {
+  id                     String   @id @default(uuid())
+  baby                   Baby     @relation(fields: [babyId], references: [id])
+  babyId                 String
+  recordDate             DateTime
+  weightKg               Float
+  heightCm               Float
+  headCircumferenceCm    Float?
+  measuredBy             String
+  notes                  String?
+  createdAt              DateTime @default(now())
+
+  @@map("growth_records")
+}
+
+model VaccineRecord {
+  id               String   @id @default(uuid())
+  baby             Baby     @relation(fields: [babyId], references: [id])
+  babyId           String
+  vaccineName      String
+  administeredDate DateTime
+  nextDueDate      DateTime?
+  lotNumber        String?
+  administeredBy   String
+  notes            String?
+  createdAt        DateTime @default(now())
+
+  @@map("vaccine_records")
+}
+
+model HealthCheck {
+  id                  String   @id @default(uuid())
+  baby                Baby     @relation(fields: [babyId], references: [id])
+  babyId              String
+  checkDate           DateTime
+  healthProfessionalId String
+  checkType           String   // routine, sick, emergency
+  diagnosis           String?
+  prescription        String?
+  recommendations     String?
+  createdAt           DateTime @default(now())
+
+  @@map("health_checks")
+}
+
+model Milestone {
+  id             String   @id @default(uuid())
+  baby           Baby     @relation(fields: [babyId], references: [id])
+  babyId         String
+  milestoneType  String   // motor, language, social, cognitive
+  description    String
+  achievedDate   DateTime
+  notes          String?
+  createdBy      String
+  createdAt      DateTime @default(now())
+
+  @@map("milestones")
+}
+
+model Notification {
+  id        String   @id @default(uuid())
+  user      User     @relation(fields: [userId], references: [id])
+  userId    String
+  baby      Baby?    @relation(fields: [babyId], references: [id])
+  babyId    String?
+  type      String   // vaccine_due, health_check, milestone, system
+  title     String
+  message   String
+  isRead    Boolean  @default(false)
+  dueDate   DateTime?
+  createdAt DateTime @default(now())
+
+  @@map("notifications")
+}
