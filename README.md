@@ -42,7 +42,7 @@ baby-health-tracker/
 
 ### 1. Cloner le dépôt
 ```bash
-git clone <url-du-repo>
+git clone Babycare
 cd baby-health-tracker
 ```
 
