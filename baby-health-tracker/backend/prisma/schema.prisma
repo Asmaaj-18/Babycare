@@ -1,0 +1,129 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql" // ou mysql selon ton projet
+  url      = env("DATABASE_URL")
+}
+
+//////////////////////////////////////////////////////
+// ENUM
+//////////////////////////////////////////////////////
+
+enum Role {
+  PARENT
+  DOCTOR
+}
+
+enum VaccineStatus {
+  PENDING
+  DONE
+  MISSED
+}
+
+//////////////////////////////////////////////////////
+// USER
+//////////////////////////////////////////////////////
+
+model User {
+  id        String   @id @default(uuid())
+  name      String
+  email     String   @unique
+  password  String
+  role      Role
+
+  babies    Baby[]   @relation("ParentBabies")
+  comments  Comment[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+//////////////////////////////////////////////////////
+// BABY
+//////////////////////////////////////////////////////
+
+model Baby {
+  id         String    @id @default(uuid())
+  name       String
+  birthDate  DateTime
+  gender     String?
+
+  parentId   String
+  parent     User      @relation("ParentBabies", fields: [parentId], references: [id], onDelete: Cascade)
+
+  sleep      Sleep[]
+  vaccines   Vaccine[]
+  growth     Growth[]
+  comments   Comment[]
+
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+}
+
+//////////////////////////////////////////////////////
+// SLEEP
+//////////////////////////////////////////////////////
+
+model Sleep {
+  id        String   @id @default(uuid())
+  startTime DateTime
+  endTime   DateTime
+  note      String?
+
+  babyId    String
+  baby      Baby     @relation(fields: [babyId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+}
+
+//////////////////////////////////////////////////////
+// VACCINE
+//////////////////////////////////////////////////////
+
+model Vaccine {
+  id        String        @id @default(uuid())
+  name      String
+  date      DateTime
+  status    VaccineStatus @default(PENDING)
+  note      String?
+
+  babyId    String
+  baby      Baby          @relation(fields: [babyId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime      @default(now())
+}
+
+//////////////////////////////////////////////////////
+// GROWTH (MESURES)
+//////////////////////////////////////////////////////
+
+model Growth {
+  id        String   @id @default(uuid())
+  weight    Float
+  height    Float
+  headSize  Float?
+
+  babyId    String
+  baby      Baby     @relation(fields: [babyId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+}
+
+//////////////////////////////////////////////////////
+// COMMENTS
+//////////////////////////////////////////////////////
+
+model Comment {
+  id        String   @id @default(uuid())
+  content   String
+
+  babyId    String
+  baby      Baby     @relation(fields: [babyId], references: [id], onDelete: Cascade)
+
+  authorId  String
+  author    User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+}

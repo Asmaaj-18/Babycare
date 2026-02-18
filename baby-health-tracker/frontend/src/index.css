@@ -1,0 +1,15 @@
+@import 'tailwindcss/base';
+@import 'tailwindcss/components';
+@import 'tailwindcss/utilities';
+
+/* 🌍 Base globale */
+html, body, #root {
+  height: 100%;
+}
+
+body {
+  background-color: var(--color-background, #f5f5f5);
+  color: #1f2937;
+  margin: 0;
+  font-family: 'Inter', system-ui, sans-serif;
+}
