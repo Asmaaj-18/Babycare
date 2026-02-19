@@ -12,6 +12,7 @@
         "start": "node dist/index.js",
         "dev": "ts-node src/index.ts",
         "prisma:studio": "prisma studio"
+        "post install": "prisma generate"
     },
     "prisma": {
         "seed": "ts-node prisma/seed.ts"
